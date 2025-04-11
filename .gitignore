@@ -1,0 +1,5 @@
+**/modprobe.d/*
+**/modprobe.d/!vfio.conf
+
+**/modules-load.d/*
+**/modules-load.d/!modules.conf

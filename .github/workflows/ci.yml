@@ -1,0 +1,56 @@
+name: CI Security Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  secrets-scan:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full git history for thorough scanning
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-path: ""  # Use default config
+          enable-git-history: true  # Explicitly enable git history scanning
+
+      - name: Run SecretScanner
+        uses: ShiftLeftSecurity/scan-action@master
+        with:
+          type: "credscan,depscan"
+          output: reports
+
+      - name: Run TruffleHog OSS with history
+        if: github.event_name == 'pull_request'
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ""  # Scan entire history
+          head: HEAD
+          extra_args: --only-verified --since-commit $(git rev-list --max-parents=0 HEAD)
+
+      - name: Run detect-secrets with history
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-detect-secrets@master
+        with:
+          reporter: github-pr-review
+          filter_mode: nofilter
+          fail_on_error: true
+          git_historical: true  # Enable git history scanning
