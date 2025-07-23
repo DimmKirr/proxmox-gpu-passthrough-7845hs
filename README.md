@@ -29,7 +29,7 @@ wget https://github.com/isc30/ryzen-gpu-passthrough-proxmox/blob/main/AMDGopDriv
 
 #### Further Reading
 Huge kudos to [isc30](https://github.com/isc30) for the [ryzen-gpu-passthrough-proxmox](https://github.com/isc30/ryzen-gpu-passthrough-proxmox) repo. 
-Tremendous amount of work and this setup wouldn not have been possible without it!
+Tremendous amount of work and this setup would not have been possible without it!
 
 ### Windows VM Configuration
 Current config used is [vm.conf](proxmox/qemu-server/vm.conf). Make sure to place it under a correct id (ie `100.conf`).
